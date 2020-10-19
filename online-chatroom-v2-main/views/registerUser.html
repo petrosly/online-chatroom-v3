@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Title of the document</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="assets/registerStyle.css" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" integrity="sha384-i1LQnF23gykqWXg6jxC2ZbCbUMxyw5gLZY6UiUS98LYV5unm8GWmfkIS6jqJfb4E" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,700,800,900i&display=swap&subset=latin-ext" rel="stylesheet">
+</head>
+<body>
+  <div class="main-div">
+    <div class="main-container container">
+      <div class="main-row row">
+        <div class="col-md-1">
+        </div>
+        <div class="main-col col-md-10">
+          <div class="outer-wrapper">
+            <form id="form-sign-up" method="post" action="/users/register">
+              <div class="member-register">
+                <p>Member Sign Up</p>
+              </div>
+              <div class="username_div">
+                <i class="fas fa-user"></i> &nbsp;
+                <input class="input100" id="usernameInput" type="text" name="username" placeholder="Username" required/>
+              </div>
+              <div class="email_div">
+                <i class="fas fa-envelope"></i> &nbsp;
+                <input class="input100" id="emailInput" type="email" name="email" placeholder="E-mail" required/>
+              </div>
+              <div class="password_div">
+                <i class="fas fa-lock"></i> &nbsp;
+                <input class="input100" id="passwordInput" type="password" name="password" placeholder="Password" required />
+              </div>
+              <div class="password_conf_div">
+                <i class="fas fa-lock"></i> &nbsp;
+                <input class="input100" if="passwordConfInput" type="password" name="passwordConf" placeholder="Password Confirmation" required/>
+              </div>
+              <div class="choose-option">
+                <div class="choose-btn">
+                  <button class="btn choose-avatar"><i class="fas fa-id-card"></i>&nbsp;Choose Avatar</button>
+                </div>
+                <div class="chosen hidden">
+                  <p class="you-chose-this">Your avatar is: </p><input type="text" class="input200 avatar-input" name="avatar" required/>
+                  <button class="btn btn-edit"><i class="fas fa-cog"></i>&nbsp;Edit</button>
+                </div>
+              </div>
+              <div class="submit_btn">
+                <button class="register-btn">REGISTER</button>
+              </div>
+              <div class="have-account">
+                <a href='/login'>Already have an account? Sign in.<i class="fas fa-long-arrow-alt-right"></i></a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-md-1">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <div class="table">
+        <p>Choose one of the following avatars.</p>
+        <i class="fas fa-times"></i>
+        <ul id="avatar-list">
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars1.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars2.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars3.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars4.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars5.png" /></a>
+          </div></li><br />
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars6.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars7.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars8.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars9.png" /></a>
+          </div></li>
+          <li><div class="li-wrapper">
+            <a href=""><img src="img/avataaars10.png" /></a>
+          </div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="myModal2" class="modal2">
+    <!-- Modal content -->
+    <div class="modal-content2">
+      <span>
+        The username you registered with is already used! Please try a new one!
+      </span>
+      <span class="close">&times;</span>
+    </div>
+  </div>
+</body>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript">
+$(function () {
+
+  $(".modal2").css("display","block");
+
+  $(".choose-avatar").on("click",(e)=>{
+    e.preventDefault();
+    $(".modal").css("display","block");
+    if($("#choose-content").hasClass("hidden")){
+      $(".list-div").removeClass("hidden");
+      $("#choose-content").removeClass("hidden");
+    }else{
+      $("#choose-content").addClass("hidden");
+      $(".list-div").addClass("hidden");
+    }
+  });
+
+  $(".modal-content ul li a").on("click",function(e){
+    e.preventDefault();
+    var avatarFile =$(this).find("img").attr("src");
+    $(".chosen").find(".avatar-input").val(avatarFile);
+    $(".avatar-option input").html("");
+    $(".avatar-option input").append(avatarFile);
+    $(".modal").css("display","none");
+    $(".choose-btn").addClass("hidden");
+    $("#choose-content").addClass("hidden");
+    $(".chosen").removeClass("hidden");
+    $(".chosen p").append('<img src="' + avatarFile+'" />');
+  });
+
+  $(".btn-edit").on("click",function(e){
+    e.preventDefault();
+    $(".modal").css("display","block");
+    $(".chosen p").html("Your avatar is: ");
+  })
+
+  $(".fa-times").on("click",function(e){
+    e.preventDefault();
+    $(".modal").css("display","none");
+  });
+
+  $('.close').on('click',(e)=>{
+    e.preventDefault();
+    $('#myModal2').css('display','none');
+  });
+
+
+  $(window).click((e)=>{
+    if(e.target.id == "myModal"){
+      $(".modal").css("display","none");
+    }
+    if(e.target.id == "myModal2"){
+      $(".modal2").css("display","none");
+    }
+  });
+
+});
+</script>
+</html>

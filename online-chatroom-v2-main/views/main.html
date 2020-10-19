@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="assets/mystyle.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Fira+Sans+Extra+Condensed:200,300,400,500,700&amp;subset=greek,greek-ext" rel="stylesheet">
+<title>Chat Application</title>
+</head>
+<body>
+<div id="main-div">
+  <div class="container">
+    <div class="main-row row">
+      <div class="col-md-1 hidden">
+      </div>
+      <div class="col-md-1 features">
+        <a href ="/users/logout"><button type="submit"><i class="fa fa-times"> Logout</i></button></a>
+      </div>
+      <div class="col-md-3 contacts-half">
+        <div class="search-container">
+              <p id="profile"></p>
+              <p>Connected Users:</p>
+        </div>
+        <div class="contacts" id="contact-list">
+          <div class="filter">
+            <input type="text" name="username" placeholder="Search for contacts" autocomplete="off">
+          </div>
+          <ul id="contact-ul">
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row user-row">
+          <div class="col-md-12"  id="chat-with">
+            <p class="welcome-banner">Welcome to our chat application!</p>
+          </div>
+        </div>
+        <div class="row pastmsgs">
+          <div class="col-md-12" class="hidden" id="message-area" >
+          </div>
+
+        </div>
+        <div  class="row">
+          <div id="welcome-content">
+            <p>Dear user,
+            welcome to our chat app!</p><p>
+              Here you can communicate with your friends, plus you can get to know other people.
+              In order to use the app, you just need to click on the person you would like to chat with and you are all set.
+            </p><p>
+              Remember to have fun. If any problem occurs contact as at: chat@support.com
+            </p>
+            <p>
+              Start  chatting right now!
+            </p>
+            <p>&nbsp;</p>
+            <div>
+              Sincerely,</div>
+              <div>
+                That Chat App team.
+            </div>
+          </div>
+          <form id="send-message" class="hidden">
+            <div class="row">
+              <div class="col-md-12 cursmg">
+                <input id="message" placeholder="Type your message." size="60" autocomplete="off"></input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+              </div>
+              <div class="col-md-4 snd">
+                <input id="submit-button" class="snd btn btn-default" type="submit"></input>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-md-2" id="last_col">
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript">
+$(function () {
+   let url= window.location.origin + '/profile';
+    $.get(url, {}, function(data){
+      appInit(data.username,data.avatar);
+    });
+});
+
+function getEventTarget(e) {
+  e = e || window.event;
+  return e.target || e.srcElement;
+}
+
+
+function appInit(uName,avatarName){
+    var socket = io();
+    var timeHours,timeMinutes,timeSeconds;
+    $("#profile").append('You are logged in as:<br /> '+ uName  +'<img class="avatarImg" src="'+avatarName +'" class="img-circle" height="30px" widht="30px"  />');
+    $("#message").click(function(){
+    //  alert("Hey there! ");
+    });
+
+    $("#message").keypress(function(){
+      socket.emit('typing',uName);
+    });
+
+    $("#message").focusout(function(){
+      socket.emit('remove_typing',uName);
+    });
+
+    socket.on('display_typing',(data)=>{
+      var receiverName = data.room;
+      receiverName = receiverName.replace(data.username,"");
+      receiverName = receiverName.replace("_","");
+      if(receiverName == uName){
+        $('.typingRightNow').remove();
+        $('#message-area').append('<div class="row clearfix typingRightNow"><span class="typing">'+ data.username+" is typing..." + "</span></div>" );
+        var idToScroll = $("#message-area");
+        var height = idToScroll[0].scrollHeight;
+        idToScroll.scrollTop(height);
+      }
+    });
+
+    socket.on('remove_typing_display',(data)=>{
+      var receiverName = data.room;
+      receiverName = receiverName.replace(data.username,"");
+      receiverName = receiverName.replace("_","");
+      if(receiverName == uName){
+        $('.typingRightNow').remove();
+      }
+    });
+
+    socket.on('connect',()=>{
+        socket.emit("new user", uName ,function(){ });
+    });
+
+    socket.on('alert_msg',(data)=>{
+      $("#alert_icon").remove();
+      $("#contact-ul li:contains('"+data.name+"')").append('<i  id="alert_icon" class="fa fa-exclamation-circle"></i>');
+      if(timeHours != null){
+        today = new Date();
+        var timeNowHours =today.getHours();
+        var timeNowMinutes = today.getMinutes();
+        var timeNowSeconds = today.getSeconds();
+        var hoursDiff = timeHours - timeNowHours;
+        var minutesDiff = timeMinutes - timeNowMinutes;
+        var secondsDiff = timeSeconds - timeNowSeconds;
+        if(hoursDiff > 0 || minutesDiff>0|| Math.abs(secondsDiff) > 3 ){
+          const sound = new Audio('assets/to-the-point.mp3');
+          sound.volume = 0.15;
+          console.log("playing sound now");
+          sound.play();
+          today = new Date();
+          timeHours =today.getHours();
+          timeMinutes = today.getMinutes();
+          timeSeconds = today.getSeconds();
+        }
+      }else{
+        const sound = new Audio('assets/to-the-point.mp3');
+        sound.volume = 0.15;
+        console.log("playing sound now");
+        sound.play();
+        today = new Date();
+        timeHours =today.getHours();
+        timeMinutes = today.getMinutes();
+        timeSeconds = today.getSeconds();
+      }
+    });
+
+    socket.on('load old messages',(data)=>{
+      for(var i=0;i<data.length;i++){
+        if(data[i].username == uName){
+          $('#message-area').append('<div class="row clearfix"><span class="our_msg">'+ data[i].msg + "</span></div>");
+        }else{
+          $('#message-area').append('<div class="row clearfix"><span class="their_msg">'+ data[i].msg + "</span></div>" );
+        }
+      }
+      var idToScroll = $("#message-area");
+      var height = idToScroll[0].scrollHeight;
+      idToScroll.scrollTop(height);
+    });
+
+    socket.on('usernames',(data)=>{
+      var str='';
+      $('#contact-list ul').html("");
+      for(i=0;i<data.usernames.length;i++) {
+        if( data.usernames[i] == "null" | data.usernames[i] == uName ) continue;
+        $('#contact-list ul').append('<li><img src="'+data.avatars[ data.usernames[i] ] +'" class="img-circle" height="40px" widht="40px" />&nbsp;<a>' + data.usernames[i] + '</a></li>');
+      }
+    })
+
+    socket.on('new message', (data)=>{
+      if(data.room == $("#message-area").data("room")){
+        $('.typingRightNow').remove();
+        console.log($("#message-area").data("room"));
+        if(data.nick == uName){
+          $('#message-area').append('<div class="row"><span class="our_msg">'+ data.msg + "</span></div>");
+        }else{
+          $('#message-area').append('<div class="row"><span class="their_msg">'+ data.msg + "</span></div>");
+        }
+        var idToScroll = $("#message-area");
+        var height = idToScroll[0].scrollHeight;
+        idToScroll.scrollTop(height);
+      }
+    })
+
+    $('#contact-ul').on('click','li',function(){
+      $("#welcome-content").hide();
+      $(this).children(".fa-exclamation-circle").hide();
+      $("#send-message").removeClass("hidden");
+      $("#message-area").removeClass("hidden");
+      $("#message-area").css({"overflow": "hidden","text-overflow": "ellipsis","overflow-y": "scroll","height": "590px"});
+      $("#message-area").html('');
+      var receiverName = new String($(this).text());
+      receiverName = receiverName.trim();
+      $("#chat-with p").html('');
+      $("#chat-with p").append("Chat with:<i>" + receiverName+"</i>")
+      var username = new String(uName);
+      if(username > receiverName ){
+        let roomName = uName + "_" + receiverName;
+        $("#message-area").data("room",roomName);
+        socket.emit('join',{room:roomName,receiver:receiverName,username:username});
+      }else if( receiverName > username){
+        let roomName = receiverName + '_' + uName;
+        $("#message-area").data("room",roomName);
+        socket.emit('join',{room:roomName,receiver:receiverName,username:username});
+      }
+    })
+
+    $('#send-message').submit(function(e){
+      e.preventDefault();
+      socket.emit('chat message', $('#message').val(),function(data){
+        $('#message-area').append('<span class="error">'+user+"</span>" );
+      });
+      $('#message').val('');
+      return false;
+    });
+
+    let input= document.querySelector('.filter input');
+    input.addEventListener('keyup',()=>{
+      let list = document.querySelectorAll('li');
+      if(list.length > 0){
+        list.forEach(element =>{
+          if(!element.innerText.includes(input.value)){
+            element.style.display = 'none';
+          }else{
+            element.style.display = 'list-item';
+          }
+        });
+      }
+
+    });
+}
+
+</script>
+</body>
+</html>

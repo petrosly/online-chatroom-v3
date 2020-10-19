@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Title of the document</title>
+  <link rel="stylesheet" type="text/css"  href="assets/loginStyle.css"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,700,800,900i&display=swap&subset=latin-ext" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" integrity="sha384-i1LQnF23gykqWXg6jxC2ZbCbUMxyw5gLZY6UiUS98LYV5unm8GWmfkIS6jqJfb4E" crossorigin="anonymous">
+</head>
+<body>
+  <div class="main-div">
+    <div class="main-container container">
+      <div class="main_row row">
+        <div class="col-md-6">
+          <div class="row clearfix row-with-photo">
+            <div class="image-div">
+              <img src="assets/user-image.png" />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="outer-wrapper">
+            <div class="member-login">
+              <p>Member Login</p>
+            </div>
+            <form autocomplete="on" method="post" action="/users/login">
+              <div class="username_div">
+                <i class="fas fa-user"></i> &nbsp;
+                <input class="input100" type="text" name="username" placeholder="Username" />
+              </div>
+              <div class="password_div">
+                <i class="fas fa-lock"></i>&nbsp;
+                <input class="input100" type="password" name="password" placeholder="Password" />
+              </div>
+              <div class="submit_btn">
+                <button class="login-btn">LOGIN</button>
+              </div>
+            </form>
+            <div class="row row-resend">
+              <div class="resend-div hidden">
+                <a id="resend-btn"><i class="fas fa-redo"></i>&nbsp;Resend authentication e-mail.</a>
+              </div>
+              <!-- The Modal -->
+              <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                  <span class="close">&times;</span>
+                  <form autocomplete="off" id="resendTokenForm" method="post" action="">
+                    <input type="email" id="resEmailInput" name="email" placeholder="Add your email" size="70"/>
+                    <button class="auth-res-btn">Resend authentication e-mail.</button>
+                  </form>
+                </div>
+              </div>
+              <div id="myModal2" class="modal2">
+                <!-- Modal content -->
+                <div class="modal-content2">
+                  <span>
+                    This account is already verified.
+                  </span>
+                  <span class="close">&times;</span>
+                </div>
+              </div>
+            </div>
+            <div class="go-register ">
+              <a href="/sign-up">Create your account<i class="fas fa-long-arrow-alt-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript">
+
+  $('#myModal2').css('display','block');
+
+  $('#resend-btn').on('click',(e)=>{
+    e.preventDefault();
+    $('#myModal').css('display','block');
+  });
+
+  $('.close').on('click',(e)=>{
+    e.preventDefault();
+    $('#myModal').css('display','none');
+    $('#myModal2').css('display','none');
+
+  });
+
+
+  $(window).click((e)=>{
+    if(e.target.id == "myModal"){
+      $(".modal").css("display","none");
+    }
+    if(e.target.id == "myModal2"){
+      $(".modal2").css("display","none");
+    }
+  });
+
+  $('#resendTokenForm').submit((e)=>{
+    var email = $('#resEmailInput').val();
+    var url = '/users/resend/';
+    url = url + email;
+    $('#resendTokenForm').attr('action',url);
+  });
+
+</script>
+</html>
